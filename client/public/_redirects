@@ -1,0 +1,9 @@
+# Netlify redirects for SPA
+/*    /index.html   200
+
+# API redirects (will be handled by backend)
+/api/*  https://maroc-cart-backend.onrender.com/api/:splat  200
+
+# Static assets
+/static/*  /static/:splat  200
+/uploads/*  https://maroc-cart-backend.onrender.com/uploads/:splat  200

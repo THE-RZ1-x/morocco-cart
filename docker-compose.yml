@@ -1,0 +1,6474 @@
+version: '3.8'version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+services:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  # MongoDB Databaseversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  mongodb:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    image: mongo:6.0version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    container_name: maroc-cart-dbversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    restart: unless-stoppedversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    ports:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - "27017:27017"version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    environment:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      MONGO_INITDB_ROOT_USERNAME: adminversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      MONGO_INITDB_ROOT_PASSWORD: passwordversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      MONGO_INITDB_DATABASE: maroc-cartversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    volumes:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - mongodb_data:/data/dbversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - ./server/data:/data/db-backupversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    networks:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - maroc-cart-networkversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  # Redis Cacheversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  redis:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    image: redis:7-alpineversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    container_name: maroc-cart-redisversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    restart: unless-stoppedversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    ports:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - "6379:6379"version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    volumes:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - redis_data:/dataversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    networks:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - maroc-cart-networkversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  # Backend APIversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  backend:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    build:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      context: .version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      dockerfile: Dockerfileversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    container_name: maroc-cart-backendversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    restart: unless-stoppedversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    ports:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - "5000:5000"version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    environment:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - NODE_ENV=productionversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - MONGO_URI_PRODUCTION=mongodb://admin:password@mongodb:27017/maroc-cart?authSource=adminversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - REDIS_URL=redis://redis:6379version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - JWT_SECRET=your-super-secret-jwt-keyversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - CLIENT_URL=http://localhost:3000version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    volumes:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - ./uploads:/app/uploadsversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    depends_on:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - mongodbversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - redisversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    networks:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - maroc-cart-networkversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  # Nginx Reverse Proxyversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  nginx:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    image: nginx:alpineversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    container_name: maroc-cart-nginxversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    restart: unless-stoppedversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    ports:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - "80:80"version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - "443:443"version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    volumes:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - ./nginx.conf:/etc/nginx/nginx.confversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - ./ssl:/etc/nginx/sslversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    depends_on:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - backendversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    networks:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+      - maroc-cart-networkversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+volumes:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  mongodb_data:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  redis_data:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+networks:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+  maroc-cart-network:version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
+    driver: bridgeversion: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: maroc-cart-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-maroc-cart}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./server/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - maroc-cart-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: maroc-cart-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-5001}:5001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=5001
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/maroc-cart}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - maroc-cart-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5001}
+        - REACT_APP_SITE_NAME=${REACT_APP_SITE_NAME:-Maroc Cart}
+    container_name: maroc-cart-client
+    restart: unless-stopped
+    ports:
+      - "${CLIENT_PORT:-3002}:80"
+    depends_on:
+      - server
+    networks:
+      - maroc-cart-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: maroc-cart-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - maroc-cart-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  maroc-cart-network:
+    driver: bridge
