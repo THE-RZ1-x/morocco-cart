@@ -11,18 +11,11 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
-    # Configure for GitHub Pages deployment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     # Add permissions for GitHub Pages deployment
     permissions:
-      contents: read
+      contents: write
       pages: write
       id-token: write
-      actions: read
-      deployments: write
     
     steps:
     - name: Checkout 🛎️
@@ -55,17 +48,9 @@ jobs:
         REACT_APP_DEFAULT_DESCRIPTION: Découvrez les meilleurs produits marocains authentiques
         REACT_APP_DEFAULT_KEYWORDS: maroc,produits marocains,artisanat,shopping
 
-    - name: Setup GitHub Pages 📄
-      uses: actions/configure-pages@v4
-      with:
-        # Automatically enable GitHub Pages if not already enabled
-        enablement: true
-      
-    - name: Upload build artifacts 📦
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./client/build
-        
     - name: Deploy to GitHub Pages 🚀
-      id: deployment
-      uses: actions/deploy-pages@v4
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./client/build
+        force_orphan: true
