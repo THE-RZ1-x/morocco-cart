@@ -1,4 +1,15 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+// Centralized API Configuration
+// Following API security requirements: using environment variables
+const getApiUrl = () => {
+  // Production API URL (you'll need to deploy your backend first)
+  if (process.env.NODE_ENV === 'production') {
+    return process.env.REACT_APP_API_URL || 'https://your-backend-url.railway.app';
+  }
+  // Development API URL
+  return process.env.REACT_APP_API_URL || 'http://localhost:5001';
+};
+
+const API_URL = getApiUrl();
 
 export default {
   API_URL,

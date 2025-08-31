@@ -1,4 +1,5 @@
 {
+  "homepage": "https://THE-RZ1-x.github.io/morocco-cart",
   "name": "client",
   "version": "0.1.0",
   "private": true,
@@ -27,6 +28,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "serve": "^14.2.0"
   },
   "overrides": {
@@ -40,7 +42,9 @@
     "eject": "react-scripts eject",
     "build:prod": "REACT_APP_NODE_ENV=production react-scripts build",
     "preview": "serve -s build -l 3002",
-    "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js"
+    "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [

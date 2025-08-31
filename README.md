@@ -2,10 +2,12 @@
 
 A modern e-commerce platform showcasing authentic Moroccan products with bilingual support (Arabic/French).
 
-## 🚀 Live Demo
+## 🌐 Live Demo
 
-- **Frontend**: [Your Netlify URL will be here]
+- **Frontend**: [GitHub Pages](https://the-rz1-x.github.io/morocco-cart)
 - **API**: [Your backend deployment URL will be here]
+
+> **Note**: The frontend is deployed on GitHub Pages. You'll need to deploy the backend separately to Railway/Render for full functionality.
 
 ## 🏗️ Architecture
 
