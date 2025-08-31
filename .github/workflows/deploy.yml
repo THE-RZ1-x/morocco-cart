@@ -6,15 +6,15 @@ on:
     paths:
       - 'client/**'
       - '.github/workflows/**'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'client/**'
-      - '.github/workflows/**'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # Configure for GitHub Pages deployment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     # Add permissions for GitHub Pages deployment
     permissions:
@@ -53,10 +53,14 @@ jobs:
         REACT_APP_DEFAULT_DESCRIPTION: Découvrez les meilleurs produits marocains authentiques
         REACT_APP_DEFAULT_KEYWORDS: maroc,produits marocains,artisanat,shopping
 
-    - name: Deploy 🚀
-      uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/main'
+    - name: Setup GitHub Pages 📄
+      uses: actions/configure-pages@v4
+      
+    - name: Upload build artifacts 📦
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./client/build
-        cname: # Add your custom domain here if you have one
+        path: ./client/build
+        
+    - name: Deploy to GitHub Pages 🚀
+      id: deployment
+      uses: actions/deploy-pages@v4
