@@ -21,6 +21,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import StarIcon from '@mui/icons-material/Star';
 import axios from 'axios';
+import API from '../config/api';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoritesContext';
 
@@ -66,7 +67,7 @@ const HomePageFixed = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/products?pageNumber=${currentPage}&pageSize=${itemsPerPage}`
+          `${API.API_URL}/api/products?pageNumber=${currentPage}&pageSize=${itemsPerPage}`
         );
         setProducts(response.data.products || response.data);
         setLoading(false);

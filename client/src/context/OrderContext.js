@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import API from '../config/api';
 
 const OrderContext = createContext();
 
@@ -27,7 +28,7 @@ export const OrderProvider = ({ children }) => {
         },
       };
 
-      const { data } = await axios.post('http://localhost:5000/api/orders', orderData, config);
+      const { data } = await axios.post(API.ENDPOINTS.ORDERS, orderData, config);
 
       setOrder(data);
       setLoading(false);
