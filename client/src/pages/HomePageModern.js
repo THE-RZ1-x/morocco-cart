@@ -62,11 +62,19 @@ const ModernHomePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        console.log('Fetching products from:', API.ENDPOINTS.PRODUCTS);
         const response = await axios.get(API.ENDPOINTS.PRODUCTS);
+        console.log('Products response:', response.data);
         setProducts(response.data.products || response.data);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load products');
+        console.error('Error fetching products:', err);
+        console.error('Error details:', {
+          message: err.message,
+          response: err.response,
+          request: err.request
+        });
+        setError('فشل في تحميل المنتجات');
         setLoading(false);
       }
     };
@@ -121,8 +129,8 @@ const ModernHomePage = () => {
                   fullWidth
                   variant="outlined"
                   placeholder="ابحث عن منتجات..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   sx={{
                     backgroundColor: 'rgba(255,255,255,0.2)',
                     borderRadius: 3,
@@ -218,6 +226,22 @@ const ModernHomePage = () => {
               </Grid>
             ))}
           </Grid>
+        ) : error ? (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h6" color="error" gutterBottom>
+              فشل في تحميل المنتجات
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى
+            </Typography>
+            <Button 
+              variant="outlined" 
+              onClick={() => window.location.reload()}
+              sx={{ borderRadius: 2 }}
+            >
+              إعادة المحاولة
+            </Button>
+          </Box>
         ) : filteredProducts.length > 0 ? (
           <Grid container spacing={4}>
             {filteredProducts.map((product) => (
