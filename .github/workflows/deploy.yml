@@ -3,8 +3,14 @@ name: Deploy React App to GitHub Pages
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'client/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'client/**'
+      - '.github/workflows/**'
 
 jobs:
   build-and-deploy:
@@ -31,7 +37,8 @@ jobs:
     - name: Install dependencies 🔧
       run: |
         cd client
-        npm ci
+        # Try npm ci first, fallback to npm install if package-lock.json issues
+        npm ci || npm install
 
     - name: Build 🏗️
       run: |
