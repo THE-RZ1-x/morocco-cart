@@ -19,14 +19,23 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install dependencies 🔧
-      working-directory: ./client
+    - name: Debug directory structure 🔍
       run: |
+        echo "Root directory contents:"
+        ls -la
+        echo "Client directory contents:"
+        ls -la client/
+        echo "Checking for package-lock.json:"
+        test -f client/package-lock.json && echo "package-lock.json found" || echo "package-lock.json NOT found"
+        
+    - name: Install dependencies 🔧
+      run: |
+        cd client
         npm ci
 
     - name: Build 🏗️
-      working-directory: ./client
       run: |
+        cd client
         npm run build
       env:
         CI: false

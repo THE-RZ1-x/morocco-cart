@@ -11,7 +11,7 @@ const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
-export default {
+const API = {
   API_URL,
   ENDPOINTS: {
     PRODUCTS: `${API_URL}/api/products`,
@@ -22,3 +22,5 @@ export default {
     UPLOAD: `${API_URL}/api/upload`,
   }
 };
+
+export default API;
