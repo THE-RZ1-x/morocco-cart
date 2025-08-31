@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import API from '../../config/api';
 
 const initialState = {
   products: [],
@@ -13,7 +14,7 @@ export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async ({ keyword = '', pageNumber = 1, category = '' }, { rejectWithValue }) => {
     try {
-      let url = `${process.env.REACT_APP_API_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`;
+      let url = `${API.API_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`;
       if (category && category !== 'All') {
         url += `&category=${category}`;
       }

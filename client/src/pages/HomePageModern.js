@@ -22,6 +22,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import StarIcon from '@mui/icons-material/Star';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API from '../config/api';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -61,7 +62,7 @@ const ModernHomePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get(API.ENDPOINTS.PRODUCTS);
         setProducts(response.data.products || response.data);
         setLoading(false);
       } catch (err) {

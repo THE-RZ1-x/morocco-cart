@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import API from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -58,7 +59,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/myorders`, {
+        const response = await fetch(`${API.ENDPOINTS.ORDERS}/myorders`, {
           headers: {
             'Authorization': `Bearer ${currentUser.token}`,
           },

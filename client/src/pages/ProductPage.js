@@ -6,6 +6,7 @@ import { useNotification } from '../context/NotificationContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import API from '../config/api';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -52,7 +53,7 @@ const ProductPage = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const { data } = await axios.get(`${API.ENDPOINTS.PRODUCT}/${id}`);
         setProduct(data);
       } catch (err) {
         setError(t('product_not_found'));
@@ -68,7 +69,7 @@ const ProductPage = () => {
     if (product) {
       const fetchRelatedProducts = async () => {
         try {
-          const { data } = await axios.get('http://localhost:5000/api/products');
+          const { data } = await axios.get(API.ENDPOINTS.PRODUCTS);
           const filtered = data.filter(
             (p) => p.category === product.category && p._id !== product._id
           );
