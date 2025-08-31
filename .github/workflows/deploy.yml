@@ -16,6 +16,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
+    # Add permissions for GitHub Pages deployment
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
     steps:
     - name: Checkout 🛎️
       uses: actions/checkout@v4
@@ -23,22 +29,17 @@ jobs:
     - name: Setup Node.js 📦
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
-    - name: Debug directory structure 🔍
-      run: |
-        echo "Root directory contents:"
-        ls -la
-        echo "Client directory contents:"
-        ls -la client/
-        echo "Checking for package-lock.json:"
-        test -f client/package-lock.json && echo "package-lock.json found" || echo "package-lock.json NOT found"
-        
     - name: Install dependencies 🔧
       run: |
         cd client
-        # Try npm ci first, fallback to npm install if package-lock.json issues
-        npm ci || npm install
+        # Ensure package-lock.json exists, then install
+        npm install
+        # Generate package-lock.json if it doesn't exist
+        if [ ! -f package-lock.json ]; then
+          npm install --package-lock-only
+        fi
 
     - name: Build 🏗️
       run: |

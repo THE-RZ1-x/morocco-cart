@@ -104,6 +104,6 @@ temp/
 uploads/
 server/uploads/
 
-# Lock files (optional - some prefer to commit these)
-package-lock.json
-yarn.lock
+# Lock files (keep these for consistent builds)
+# package-lock.json
+# yarn.lock
